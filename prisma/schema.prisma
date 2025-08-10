@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum for Role-Based Access Control
+enum Role {
+  MANAGER
+  CARE_WORKER
+}
+
+// Enum for the status of a shift
+enum ShiftStatus {
+  CLOCKED_IN
+  CLOCKED_OUT
+}
+
+// User model for authentication and role management
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  auth0Id   String    @unique // Stores the unique ID from Auth0
+  name      String?
+  role      Role      @default(CARE_WORKER)
+  shifts    Shift[]   // Relation to all shifts for this user
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Location model for geofencing
+model Location {
+  id        String    @id @default(cuid())
+  name      String
+  latitude  Float
+  longitude Float
+  radius    Int       // Radius of the geofence in meters
+  shifts    Shift[]   // Relation to all shifts at this location
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Shift model for tracking clock-in/out events
+model Shift {
+  id              String      @id @default(cuid())
+  clockInTime     DateTime
+  clockOutTime    DateTime?   // Optional: null when shift is active
+  clockInLat      Float
+  clockInLng      Float
+  clockOutLat     Float?      // Optional: captured on clock-out
+  clockOutLng     Float?      // Optional: captured on clock-out
+  clockInNote     String?
+  clockOutNote    String?
+  status          ShiftStatus @default(CLOCKED_IN)
+  totalHours      Float?      // Optional: calculated on clock-out
+
+  // --- Relations ---
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  location        Location    @relation(fields: [locationId], references: [id])
+  locationId      String
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
