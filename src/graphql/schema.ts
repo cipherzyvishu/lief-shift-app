@@ -56,5 +56,6 @@ export const typeDefs = gql`
         hello: String
         users: [User!]
         myActiveShift: Shift
+        activeShifts: [Shift!]!
     }
     `;

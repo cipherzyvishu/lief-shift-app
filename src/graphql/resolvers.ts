@@ -61,6 +61,35 @@ export const resolvers = {
 
       return activeShift;
     },
+
+    // Secure resolver for managers to get all active shifts
+    activeShifts: async (parent: any, args: any, context: any) => {
+      // Check if user is authenticated
+      if (!context.session || !context.user) {
+        throw new Error('You must be authenticated to access this resource');
+      }
+
+      // Check if user has MANAGER role
+      if (context.user.role !== 'MANAGER') {
+        throw new Error('Access denied. Manager role required to view active staff');
+      }
+
+      // Fetch all shifts that are currently CLOCKED_IN with user details
+      const activeShifts = await prisma.shift.findMany({
+        where: {
+          status: 'CLOCKED_IN'
+        },
+        include: {
+          user: true,
+          location: true
+        },
+        orderBy: {
+          clockInTime: 'desc' // Most recent clock-ins first
+        }
+      });
+
+      return activeShifts;
+    },
   },
 
   // Resolvers for nested fields
