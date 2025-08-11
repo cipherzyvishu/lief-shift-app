@@ -1,7 +1,9 @@
 import { auth0 } from "@/lib/auth0";
+import { prisma } from "@/lib/prisma";
 import UserSync from "@/components/UserSync";
 import ClockInControls from "@/components/ClockInControls";
 import ActiveShiftDisplay from "@/components/ActiveShiftDisplay";
+import Navigation from "@/components/Navigation";
 import './globals.css';
 
 export default async function Home() {
@@ -22,10 +24,25 @@ export default async function Home() {
     );
   }
 
-  // If session exists, show a welcome message and logout button
+  // Fetch user's database profile for navigation
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+    }
+  });
+
+  // If session exists, show the main application
   return (
     <main>
       <h1>Welcome, {session.user.name}!</h1>
+      
+      {/* Role-based navigation */}
+      <Navigation user={user} />
+      
       <UserSync />
       
       {/* Display current active shift using secure GraphQL */}
