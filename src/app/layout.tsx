@@ -4,6 +4,7 @@ import "./globals.css";
 import { Auth0Provider } from "@auth0/nextjs-auth0";
 import { auth0 } from "~/lib/auth0";
 import { ShiftProvider } from "@/context/ShiftContext";
+import '@ant-design/v5-patch-for-react-19';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth0.getSession()
+  let session = null;
+  try {
+    session = await auth0.getSession();
+  } catch (error) {
+    console.error('Session error in layout:', error);
+    // Continue with null session - Auth0Provider will handle login redirect
+  }
+
   return (
     <html lang="en">
       <body
