@@ -10,6 +10,7 @@ import {
   BarChartOutlined,
   EnvironmentOutlined
 } from '@ant-design/icons';
+import ActiveStaffTable from './dashboard/ActiveStaffTable';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -98,18 +99,10 @@ export default function ManagerDashboard({ user }: ManagerDashboardProps) {
       <Row gutter={[16, 16]}>
         {/* Left Column - Staff Management */}
         <Col xs={24} lg={14}>
-          <Card title={<><TeamOutlined /> Current Staff Status</>} style={{ marginBottom: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <TeamOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-              <Title level={4} type="secondary">Staff Monitoring Coming Soon</Title>
-              <Paragraph type="secondary">
-                Real-time staff clock-in/out status and location tracking will be available here.
-              </Paragraph>
-              <Button type="dashed" disabled>
-                View All Staff
-              </Button>
-            </div>
-          </Card>
+          {/* Active Staff Table - Real Implementation */}
+          <div style={{ marginBottom: '16px' }}>
+            <ActiveStaffTable />
+          </div>
 
           <Card title={<><ClockCircleOutlined /> Recent Shift Activity</>}>
             <div style={{ textAlign: 'center', padding: '40px 20px' }}>
