@@ -1,16 +1,13 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
 }
 
 // Enum for Role-Based Access Control
@@ -35,6 +32,8 @@ model User {
   shifts    Shift[]   // Relation to all shifts for this user
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@map("User")  // Maps to "User" table in your Docker backup
 }
 
 // Location model for geofencing
@@ -47,12 +46,14 @@ model Location {
   shifts    Shift[]   // Relation to all shifts at this location
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@map("Location")  // Maps to "Location" table in your Docker backup
 }
 
 // Shift model for tracking clock-in/out events
 model Shift {
   id              String      @id @default(cuid())
-  clockInTime     DateTime
+  clockInTime     DateTime    @default(now())
   clockOutTime    DateTime?   // Optional: null when shift is active
   clockInLat      Float
   clockInLng      Float
@@ -71,5 +72,6 @@ model Shift {
 
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-}
 
+  @@map("Shift")  // Maps to "Shift" table in your Docker backup
+}

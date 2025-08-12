@@ -1,36 +1,303 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lief Healthcare Shift Management System
 
-## Getting Started
+A comprehensive healthcare worker shift management application built with Next.js, featuring role-based access control, real-time monitoring, and secure authentication.
 
-First, run the development server:
+## 🏥 About
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Lief is a modern healthcare workforce management solution that enables:
+- **Care Workers** to clock in/out with GPS location tracking
+- **Managers** to monitor active staff in real-time and access analytics
+- **Administrators** to manage locations, users, and system settings
+
+Built for healthcare facilities requiring precise time tracking, location verification, and workforce visibility.
+
+## 🚀 Tech Stack
+
+### Frontend
+- **Next.js 15.4.6** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Ant Design 5.26.7** - Professional UI component library
+- **Tailwind CSS** - Utility-first styling
+
+### Backend
+- **GraphQL** - Type-safe API with Apollo Server
+- **Prisma 6.13.0** - Database ORM and schema management
+- **PostgreSQL** - Production-ready database
+
+### Authentication & Security
+- **Auth0 v4.9.0** - Enterprise authentication service
+- **Role-Based Access Control (RBAC)** - Manager/Care Worker permissions
+- **JWT Sessions** - Secure session management
+
+### Development Tools
+- **ESLint** - Code linting and formatting
+- **TypeScript** - Static type checking
+- **Prisma Studio** - Database administration
+
+## 🏗️ Architecture
+
+```
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   │   ├── api/             # API routes (Auth0, GraphQL)
+│   │   ├── dashboard/       # Role-based dashboard pages
+│   │   └── error/           # Error handling pages
+│   ├── components/          # Reusable React components
+│   │   ├── dashboard/       # Manager dashboard components
+│   │   └── shift/           # Shift management components
+│   ├── context/             # React Context providers
+│   ├── graphql/             # GraphQL schema and resolvers
+│   ├── lib/                 # Utility libraries (Auth0, Prisma)
+│   └── middleware.ts        # Auth0 middleware
+├── prisma/                  # Database schema and migrations
+└── public/                  # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📊 Current Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ✅ Phase 1: Core Authentication & Security
+- **Auth0 Integration**: Secure login/logout with session management
+- **Role-Based Access Control**: Manager and Care Worker role separation
+- **Protected Routes**: Server-side route protection with automatic redirects
+- **Session Error Handling**: Graceful JWE error recovery and session reset
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### ✅ Phase 2: Shift Management System
+- **GraphQL API**: Secure, type-safe API with role-based resolvers
+- **Clock In/Out System**: GPS location capture with PostgreSQL persistence
+- **Real-time UI Updates**: React Context state management
+- **Location Tracking**: Latitude/longitude capture for compliance
+- **Shift Notes**: Optional notes during clock-in/out operations
 
-## Learn More
+### ✅ Phase 3: Manager Dashboard & Monitoring
+- **Manager Dashboard**: Role-restricted admin interface
+- **Active Staff Table**: Real-time monitoring of clocked-in workers
+- **Live Updates**: Auto-refresh every 30 seconds
+- **Staff Details**: Name, location, clock-in time, and notes display
+- **Professional UI**: Ant Design table with sorting and pagination
 
-To learn more about Next.js, take a look at the following resources:
+### 🚧 In Development
+- **Analytics Dashboard**: Charts and metrics for shift data
+- **Geofencing**: Location perimeter validation
+- **Shift History**: Detailed time tracking reports
+- **Location Management**: Admin tools for site configuration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛡️ Security Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Multi-layer RBAC**: Page, API, and component-level access control
+- **Session Validation**: Server-side Auth0 session verification
+- **GraphQL Security**: Role-based query/mutation protection
+- **Environment Isolation**: Secure environment variable management
+- **Error Boundaries**: Graceful error handling and recovery
 
-## Deploy on Vercel
+## 🗄️ Database Schema
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```sql
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(CARE_WORKER)
+  shifts    Shift[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+model Location {
+  id        String   @id @default(cuid())
+  name      String
+  latitude  Float
+  longitude Float
+  radius    Int
+  shifts    Shift[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Shift {
+  id           String      @id @default(cuid())
+  userId       String
+  locationId   String
+  clockInTime  DateTime    @default(now())
+  clockOutTime DateTime?
+  status       ShiftStatus @default(CLOCKED_IN)
+  totalHours   Float?
+  // GPS coordinates and notes...
+}
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ and npm
+- PostgreSQL database
+- Auth0 account and application
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd lief-shift-app
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Environment Setup**
+Create `.env.local` with the following variables:
+```bash
+# Database
+DATABASE_URL="postgresql://..."
+
+# Auth0 Configuration
+AUTH0_SECRET="..."
+AUTH0_BASE_URL="http://localhost:3000"
+AUTH0_ISSUER_BASE_URL="https://your-domain.auth0.com"
+AUTH0_CLIENT_ID="..."
+AUTH0_CLIENT_SECRET="..."
+
+# Application
+APP_BASE_URL="http://localhost:3000"
+```
+
+4. **Database Setup**
+```bash
+# Run Prisma migrations
+npx prisma migrate dev
+
+# Seed the database (optional)
+npx prisma db seed
+```
+
+5. **Start Development Server**
+```bash
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
+
+## 👥 User Roles & Access
+
+### Care Worker
+- Clock in/out with GPS location
+- Add optional shift notes
+- View personal shift status
+- Access to main dashboard
+
+### Manager
+- All Care Worker permissions
+- View real-time active staff table
+- Access manager-only dashboard
+- Monitor workforce in real-time
+- (Coming soon: Analytics and reports)
+
+## 🔧 Development Commands
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npx prisma studio    # Open database admin
+npx prisma migrate   # Run database migrations
+```
+
+## 📱 API Endpoints
+
+### Authentication (Auth0)
+- `GET /api/auth/login` - Login redirect
+- `GET /api/auth/logout` - Logout and clear session
+- `GET /api/auth/callback` - Auth0 callback handler
+
+### GraphQL API
+- `POST /api/graphql` - Main GraphQL endpoint
+
+### Utility APIs
+- `GET /api/user/profile` - Get current user profile
+- `POST /api/clock-in` - Clock in with location
+- `POST /api/clock-out` - Clock out with location
+
+## 📚 GraphQL Schema
+
+### Queries
+```graphql
+type Query {
+  hello: String                    # Health check
+  users: [User!]                   # All users (admin)
+  myActiveShift: Shift            # Current user's active shift
+  activeShifts: [Shift!]!         # All active shifts (manager only)
+}
+```
+
+### Types
+```graphql
+type User {
+  id: ID!
+  email: String!
+  name: String
+  role: Role!
+  shifts: [Shift!]!
+}
+
+type Shift {
+  id: ID!
+  clockInTime: DateTime!
+  clockOutTime: DateTime
+  status: ShiftStatus!
+  clockInNote: String
+  user: User!
+  location: Location!
+}
+```
+
+## 🧪 Testing
+
+The application includes comprehensive testing documentation:
+- `TESTING_GUIDE.md` - General testing procedures
+- `ACTIVE_STAFF_TESTING.md` - Manager dashboard testing
+- `RBAC_IMPLEMENTATION.md` - Security testing guide
+
+## 📝 Documentation
+
+- `EXAMPLES.md` - Code examples and usage patterns
+- `GRAPHQL_IMPLEMENTATION.md` - GraphQL setup and security
+- `CLOCK_IN_IMPLEMENTATION.md` - Shift management system
+- `RBAC_IMPLEMENTATION.md` - Role-based access control
+
+## 🚦 Project Status
+
+**Current Phase**: Manager Dashboard Development
+**Progress**: ~75% Complete
+**Next Milestone**: Analytics Dashboard with Chart.js integration
+
+### Completed ✅
+- Authentication & RBAC system
+- Clock-in/out functionality with GPS
+- Manager dashboard with real-time staff monitoring
+- GraphQL API with role-based security
+- Professional UI with Ant Design
+
+### In Progress 🚧
+- Analytics dashboard with charts and metrics
+- Geofencing for location validation
+- Advanced shift history and reporting
+
+### Planned 📅
+- Mobile-responsive enhancements
+- Advanced location management
+- Notification system
+- Shift scheduling features
+
+## 🤝 Contributing
+
+This is a healthcare workforce management system built for compliance and reliability. All contributions should maintain the high security and quality standards established in the codebase.
+
+## 📄 License
+
+This project is part of the Lief healthcare workforce management solution.
+
+---
+
+**Built with ❤️ for healthcare workers and administrators**
