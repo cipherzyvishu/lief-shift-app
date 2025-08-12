@@ -200,9 +200,35 @@ npm run dev          # Start development server
 npm run build        # Build for production
 npm run start        # Start production server
 npm run lint         # Run ESLint
+npm run type-check   # TypeScript type checking
+npm run build:check  # Full build validation
 npx prisma studio    # Open database admin
 npx prisma migrate   # Run database migrations
+npm run db:seed      # Seed database with sample data
+npm run check-locations  # Verify locations exist
+npm run deploy-prep  # Prepare for deployment
 ```
+
+## 🚀 Deployment
+
+This application is ready for production deployment. See `DEPLOYMENT.md` for detailed deployment instructions.
+
+### Quick Deployment Check
+```bash
+npm run build:check  # Validates types, linting, and build
+```
+
+### Deployment Requirements
+- Node.js 18+ 
+- PostgreSQL database
+- Auth0 application configured
+- Environment variables set (see `.env.example`)
+
+### Deployment Platforms
+- ✅ Vercel (recommended)
+- ✅ Netlify 
+- ✅ Docker containers
+- ✅ Traditional hosting (PM2, etc.)
 
 ## 📱 API Endpoints
 
@@ -255,9 +281,15 @@ type Shift {
 ## 🧪 Testing
 
 The application includes comprehensive testing documentation:
-- `TESTING_GUIDE.md` - General testing procedures
+- `DEPLOYMENT.md` - Production deployment testing procedures
 - `ACTIVE_STAFF_TESTING.md` - Manager dashboard testing
-- `RBAC_IMPLEMENTATION.md` - Security testing guide
+- Manual testing for all user flows and edge cases
+
+### Testing Approach
+- **Unit Testing**: Component-level testing for critical business logic
+- **Integration Testing**: API endpoint and database integration testing
+- **User Acceptance Testing**: Role-based access control and workflow testing
+- **Security Testing**: Authentication and authorization validation
 
 ## 📝 Documentation
 

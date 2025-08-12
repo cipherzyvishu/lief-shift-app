@@ -64,7 +64,7 @@ export default function ActiveShiftDisplay() {
         setActiveShift(result.data?.myActiveShift || null);
         setError(null);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch active shift');
     } finally {
       setLoading(false);

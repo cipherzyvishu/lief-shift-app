@@ -5,7 +5,6 @@ import { Card, Button, Space, Typography, Tag } from 'antd';
 import { 
   DashboardOutlined, 
   UserOutlined, 
-  SettingOutlined,
   LogoutOutlined 
 } from '@ant-design/icons';
 import Link from 'next/link';

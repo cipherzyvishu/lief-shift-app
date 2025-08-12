@@ -43,7 +43,7 @@ const testGraphQLQuery = async () => {
 
 // For browser console testing
 if (typeof window !== 'undefined') {
-  (window as any).testGraphQL = testGraphQLQuery;
+  (window as unknown as Record<string, unknown>).testGraphQL = testGraphQLQuery;
 }
 
 export { testGraphQLQuery };

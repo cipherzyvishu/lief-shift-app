@@ -210,7 +210,7 @@ export default function ActiveStaffTable() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) => (
+      render: () => (
         <Tag color="green">ACTIVE</Tag>
       ),
     }

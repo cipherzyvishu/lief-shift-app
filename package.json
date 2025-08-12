@@ -6,7 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset --force",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "check-locations": "node scripts/check-locations.js",
+    "validate-deployment": "node scripts/validate-deployment.js",
+    "prebuild": "prisma generate && node scripts/check-locations.js",
+    "type-check": "tsc --noEmit",
+    "build:check": "npm run type-check && npm run lint && npm run build",
+    "deploy-prep": "node -e \"console.log('Run scripts/deploy-prep.bat (Windows) or scripts/deploy-prep.sh (Linux/Mac)')\"",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"

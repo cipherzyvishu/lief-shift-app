@@ -1,6 +1,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { GraphQLScalarType, Kind } from 'graphql';
+import { GraphQLContext, GraphQLResolverParent } from './types';
 
 // A custom resolver to handle the DateTime type we defined in our schema
 const dateTimeScalar = new GraphQLScalarType({
@@ -41,7 +42,7 @@ export const resolvers = {
     },
 
     // Secure resolver for getting the current user's active shift
-    myActiveShift: async (parent: any, args: any, context: any) => {
+    myActiveShift: async (_parent: unknown, _args: unknown, context: GraphQLContext) => {
       // Check if user is authenticated
       if (!context.session || !context.user) {
         throw new Error('You must be authenticated to access this resource');
@@ -63,7 +64,7 @@ export const resolvers = {
     },
 
     // Secure resolver for managers to get all active shifts
-    activeShifts: async (parent: any, args: any, context: any) => {
+    activeShifts: async (_parent: unknown, _args: unknown, context: GraphQLContext) => {
       // Check if user is authenticated
       if (!context.session || !context.user) {
         throw new Error('You must be authenticated to access this resource');
@@ -94,7 +95,7 @@ export const resolvers = {
 
   // Resolvers for nested fields
   User: {
-    shifts: async (parent: any) => {
+    shifts: async (parent: GraphQLResolverParent) => {
       return await prisma.shift.findMany({
         where: { userId: parent.id },
         include: {
@@ -106,14 +107,14 @@ export const resolvers = {
   },
 
   Shift: {
-    user: async (parent: any) => {
+    user: async (parent: GraphQLResolverParent) => {
       return await prisma.user.findUnique({
-        where: { id: parent.userId }
+        where: { id: parent.userId as string }
       });
     },
-    location: async (parent: any) => {
+    location: async (parent: GraphQLResolverParent) => {
       return await prisma.location.findUnique({
-        where: { id: parent.locationId }
+        where: { id: parent.locationId as string }
       });
     },
   },

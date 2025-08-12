@@ -2,12 +2,27 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
+// Define types for better type safety
+interface Location {
+  name: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface ActiveShift {
+  id: string;
+  clockInTime: string;
+  clockInNote?: string;
+  status: string;
+  location: Location;
+}
+
 // Define the context state interface
 interface ShiftContextState {
   isClockedIn: boolean;
   loading: boolean;
   error: string | null;
-  activeShift: any | null;
+  activeShift: ActiveShift | null;
   handleClockIn: (notes?: string) => Promise<void>;
   handleClockOut: (notes?: string) => Promise<void>;
   checkActiveShift: () => Promise<void>;
@@ -26,7 +41,7 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
   const [isClockedIn, setIsClockedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeShift, setActiveShift] = useState<any | null>(null);
+  const [activeShift, setActiveShift] = useState<ActiveShift | null>(null);
 
   // Function to get user's location
   const getUserLocation = (): Promise<{ latitude: number; longitude: number }> => {
@@ -43,7 +58,7 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
             longitude: position.coords.longitude,
           });
         },
-        (error) => {
+        () => {
           console.warn('Location access denied, using default location');
           // Use default location if user denies location access
           resolve({ latitude: 0, longitude: 0 });
@@ -130,7 +145,7 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
         setError(result.error || 'Failed to clock in');
         console.error('❌ Clock-in failed:', result.error);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError('Network error during clock-in');
       console.error('❌ Clock-in network error:', error);
     } finally {
@@ -169,7 +184,7 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
         setError(result.error || 'Failed to clock out');
         console.error('❌ Clock-out failed:', result.error);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError('Network error during clock-out');
       console.error('❌ Clock-out network error:', error);
     } finally {

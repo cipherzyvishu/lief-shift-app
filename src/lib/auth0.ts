@@ -2,7 +2,7 @@ import { Auth0Client } from "@auth0/nextjs-auth0/server";
 import { NextResponse } from "next/server";
 
 export const auth0 = new Auth0Client({
-  async onCallback(error, context, session) {
+  async onCallback(error, context) {
     if (error) {
       console.error("Auth0 callback error:", error);
       // Redirect to error page with error message
