@@ -91,6 +91,58 @@ export const resolvers = {
 
       return activeShifts;
     },
+
+    // Secure resolver for managers to get paginated shift history
+    allShifts: async (_parent: unknown, args: { skip?: number; take?: number }, context: GraphQLContext) => {
+      // Check if user is authenticated
+      if (!context.session || !context.user) {
+        throw new Error('You must be authenticated to access this resource');
+      }
+
+      // Check if user has MANAGER role
+      if (context.user.role !== 'MANAGER') {
+        throw new Error('Access denied. Manager role required to view shift history');
+      }
+
+      // Set default pagination values
+      const skip = args.skip || 0;
+      const take = args.take || 10; // Default to 10 items per page
+      const maxTake = 100; // Prevent too large queries
+
+      // Ensure take doesn't exceed maximum
+      const limitedTake = Math.min(take, maxTake);
+
+      console.log(`🔍 Manager ${context.user.email} requesting shifts with pagination: skip=${skip}, take=${limitedTake}`);
+
+      // Get paginated shifts with related data
+      const shifts = await prisma.shift.findMany({
+        skip,
+        take: limitedTake,
+        include: {
+          user: true,
+          location: true
+        },
+        orderBy: {
+          clockInTime: 'desc' // Most recent shifts first
+        }
+      });
+
+      // Get total count for pagination
+      const totalCount = await prisma.shift.count();
+
+      // Calculate pagination metadata
+      const hasNextPage = skip + limitedTake < totalCount;
+      const hasPreviousPage = skip > 0;
+
+      console.log(`📊 Retrieved ${shifts.length} shifts out of ${totalCount} total`);
+
+      return {
+        shifts,
+        totalCount,
+        hasNextPage,
+        hasPreviousPage
+      };
+    },
   },
 
   // Resolvers for nested fields

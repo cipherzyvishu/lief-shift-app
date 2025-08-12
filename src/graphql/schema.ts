@@ -51,11 +51,19 @@ export const typeDefs = gql`
         user: User!
         location: Location!
     }
+
+    type ShiftConnection {
+        shifts: [Shift!]!
+        totalCount: Int!
+        hasNextPage: Boolean!
+        hasPreviousPage: Boolean!
+    }
     
     type Query {
         hello: String
         users: [User!]
         myActiveShift: Shift
         activeShifts: [Shift!]!
+        allShifts(skip: Int, take: Int): ShiftConnection!
     }
     `;

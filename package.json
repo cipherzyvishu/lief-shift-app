@@ -20,9 +20,6 @@
     "deploy-prep": "node -e \"console.log('Run scripts/deploy-prep.bat (Windows) or scripts/deploy-prep.sh (Linux/Mac)')\"",
     "postinstall": "prisma generate"
   },
-  "prisma": {
-    "seed": "ts-node --project prisma/tsconfig.seed.json prisma/seed.ts"
-  },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@apollo/server": "^5.0.0",
