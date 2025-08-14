@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import ActiveStaffTable from './dashboard/ActiveStaffTable';
 import ShiftHistoryTable from './dashboard/ShiftHistoryTable';
+import LocationManagement from './dashboard/LocationManagement';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -125,6 +126,16 @@ export default function ManagerDashboard({ user }: ManagerDashboardProps) {
                   </span>
                 ),
                 children: <ShiftHistoryTable />
+              },
+              {
+                key: 'locations',
+                label: (
+                  <span>
+                    <EnvironmentOutlined />
+                    Location Management
+                  </span>
+                ),
+                children: <LocationManagement />
               }
             ]}
           />
@@ -145,16 +156,26 @@ export default function ManagerDashboard({ user }: ManagerDashboardProps) {
             </div>
           </Card>
 
-          <Card title={<><EnvironmentOutlined /> Location Management</>}>
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <EnvironmentOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-              <Title level={4} type="secondary">Geofencing Coming Soon</Title>
-              <Paragraph type="secondary">
-                Set up location perimeters and manage clock-in boundaries for different sites.
+          <Card title={<><EnvironmentOutlined /> Geofencing Status</>}>
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <Text strong>✅ Location-Based Security Active</Text>
+              </div>
+              <Paragraph type="secondary" style={{ fontSize: '14px', marginBottom: '12px' }}>
+                All clock-in attempts are now validated against location geofences. Care workers must be within the specified radius to clock in.
               </Paragraph>
-              <Button type="dashed" disabled>
-                Manage Locations
-              </Button>
+              <div style={{ marginBottom: '8px' }}>
+                <Tag color="green">Geofencing Enabled</Tag>
+              </div>
+              <div style={{ marginBottom: '8px' }}>
+                <Tag color="blue">GPS Validation</Tag>
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <Tag color="orange">Manager Controls</Tag>
+              </div>
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                Use the "Location Management" tab to adjust geofence radii for each workplace.
+              </Text>
             </div>
           </Card>
         </Col>

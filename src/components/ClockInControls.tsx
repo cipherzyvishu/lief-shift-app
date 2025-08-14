@@ -8,7 +8,17 @@ const { TextArea } = Input;
 const { Text } = Typography;
 
 export default function ClockInControls() {
-  const { isClockedIn, loading, error, activeShift, handleClockIn, handleClockOut } = useShift();
+  const { 
+    isClockedIn, 
+    loading, 
+    error, 
+    isGeofenceError, 
+    geofenceDetails, 
+    activeShift, 
+    handleClockIn, 
+    handleClockOut,
+    clearError 
+  } = useShift();
   const [notes, setNotes] = useState<string>('');
 
   // Handle clock in button click
@@ -31,14 +41,35 @@ export default function ClockInControls() {
       style={{ maxWidth: 400, margin: '20px auto' }}
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        {/* Error Display */}
+        {/* Error Display - Enhanced for Geofence Errors */}
         {error && (
           <Alert
-            message="Error"
-            description={error}
-            type="error"
+            message={isGeofenceError ? "Location Verification Failed" : "Error"}
+            description={
+              isGeofenceError && geofenceDetails ? (
+                <div>
+                  <div style={{ marginBottom: '8px' }}>{error}</div>
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    <strong>Distance from {geofenceDetails.locationName}:</strong> {Math.round(geofenceDetails.distance)}m<br />
+                    <strong>Maximum allowed distance:</strong> {geofenceDetails.maxDistance}m<br />
+                    <strong>You need to be:</strong> {Math.round(geofenceDetails.distance - geofenceDetails.maxDistance)}m closer
+                  </div>
+                </div>
+              ) : (
+                error
+              )
+            }
+            type={isGeofenceError ? "warning" : "error"}
             showIcon
             closable
+            onClose={clearError}
+            action={
+              isGeofenceError ? (
+                <Button size="small" type="text" onClick={() => window.location.reload()}>
+                  Retry
+                </Button>
+              ) : null
+            }
           />
         )}
 

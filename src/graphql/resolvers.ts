@@ -143,6 +143,52 @@ export const resolvers = {
         hasPreviousPage
       };
     },
+
+    // Resolver for fetching all locations (for manager dashboard)
+    allLocations: async (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      // Check if user is authenticated and is a manager
+      if (!context.session || !context.user) {
+        throw new Error('You must be authenticated to access this resource');
+      }
+
+      if (context.user.role !== 'MANAGER') {
+        throw new Error('You must be a manager to access location data');
+      }
+
+      return await prisma.location.findMany({
+        orderBy: { name: 'asc' }
+      });
+    },
+  },
+
+  Mutation: {
+    // Secure resolver for updating location geofence radius
+    updateLocation: async (_parent: unknown, args: { locationId: string; radius: number }, context: GraphQLContext) => {
+      // Check if user is authenticated and is a manager
+      if (!context.session || !context.user) {
+        throw new Error('You must be authenticated to perform this action');
+      }
+
+      if (context.user.role !== 'MANAGER') {
+        throw new Error('You must be a manager to update location settings');
+      }
+
+      // Validate radius (must be positive and reasonable)
+      if (args.radius < 10 || args.radius > 10000) {
+        throw new Error('Radius must be between 10 and 10,000 meters');
+      }
+
+      try {
+        const updatedLocation = await prisma.location.update({
+          where: { id: args.locationId },
+          data: { radius: args.radius }
+        });
+
+        return updatedLocation;
+      } catch {
+        throw new Error('Failed to update location. Please check if the location exists.');
+      }
+    },
   },
 
   // Resolvers for nested fields

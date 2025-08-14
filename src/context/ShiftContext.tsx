@@ -22,10 +22,17 @@ interface ShiftContextState {
   isClockedIn: boolean;
   loading: boolean;
   error: string | null;
+  isGeofenceError: boolean;
+  geofenceDetails: {
+    distance: number;
+    maxDistance: number;
+    locationName: string;
+  } | null;
   activeShift: ActiveShift | null;
   handleClockIn: (notes?: string) => Promise<void>;
   handleClockOut: (notes?: string) => Promise<void>;
   checkActiveShift: () => Promise<void>;
+  clearError: () => void;
 }
 
 // Create the context
@@ -41,7 +48,20 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
   const [isClockedIn, setIsClockedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isGeofenceError, setIsGeofenceError] = useState<boolean>(false);
+  const [geofenceDetails, setGeofenceDetails] = useState<{
+    distance: number;
+    maxDistance: number;
+    locationName: string;
+  } | null>(null);
   const [activeShift, setActiveShift] = useState<ActiveShift | null>(null);
+
+  // Function to clear error state
+  const clearError = () => {
+    setError(null);
+    setIsGeofenceError(false);
+    setGeofenceDetails(null);
+  };
 
   // Function to get user's location
   const getUserLocation = (): Promise<{ latitude: number; longitude: number }> => {
@@ -117,7 +137,7 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
   // Function to handle clocking in
   const handleClockIn = async (notes?: string) => {
     setLoading(true);
-    setError(null);
+    clearError(); // Clear any previous errors
 
     try {
       // Get user's location
@@ -142,11 +162,19 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
         setActiveShift(result.shift);
         console.log('✅ Successfully clocked in:', result.shift);
       } else {
-        setError(result.error || 'Failed to clock in');
-        console.error('❌ Clock-in failed:', result.error);
+        // TASK 4.4: Handle geofence errors specifically
+        if (result.error === 'GEOFENCE_VIOLATION') {
+          setIsGeofenceError(true);
+          setGeofenceDetails(result.details || null);
+          setError(result.message || 'You are too far from the location to clock in');
+          console.error('🚫 Geofence violation:', result);
+        } else {
+          setError(result.error || 'Failed to clock in');
+          console.error('❌ Clock-in failed:', result.error);
+        }
       }
     } catch (error: unknown) {
-      setError('Network error during clock-in');
+      setError('Network error during clock-in. Please check your connection.');
       console.error('❌ Clock-in network error:', error);
     } finally {
       setLoading(false);
@@ -197,10 +225,13 @@ export const ShiftProvider: React.FC<ShiftProviderProps> = ({ children }) => {
     isClockedIn,
     loading,
     error,
+    isGeofenceError,
+    geofenceDetails,
     activeShift,
     handleClockIn,
     handleClockOut,
     checkActiveShift,
+    clearError,
   };
 
   return (
