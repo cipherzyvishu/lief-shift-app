@@ -58,6 +58,21 @@ export const typeDefs = gql`
         hasNextPage: Boolean!
         hasPreviousPage: Boolean!
     }
+
+    type DailyStats {
+        date: String!
+        avgHours: Float!
+        totalClockIns: Int!
+        totalStaffActive: Int!
+    }
+
+    type StaffWeeklyHours {
+        staffId: String!
+        staffName: String!
+        staffEmail: String!
+        totalHours: Float!
+        shiftsCount: Int!
+    }
     
     type Query {
         hello: String
@@ -66,6 +81,8 @@ export const typeDefs = gql`
         activeShifts: [Shift!]!
         allShifts(skip: Int, take: Int): ShiftConnection!
         allLocations: [Location!]!
+        dailyStats(date: String!): DailyStats!
+        weeklyHoursPerStaff: [StaffWeeklyHours!]!
     }
 
     type Mutation {

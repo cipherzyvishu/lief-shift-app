@@ -15,6 +15,7 @@ import {
 import ActiveStaffTable from './dashboard/ActiveStaffTable';
 import ShiftHistoryTable from './dashboard/ShiftHistoryTable';
 import LocationManagement from './dashboard/LocationManagement';
+import AnalyticsDashboard from './dashboard/AnalyticsDashboard';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -100,86 +101,84 @@ export default function ManagerDashboard({ user }: ManagerDashboardProps) {
       </Row>
 
       {/* Main Content Areas */}
-      <Row gutter={[16, 16]}>
-        {/* Left Column - Staff Management */}
-        <Col xs={24} lg={14}>
-          {/* Staff Management Tabs */}
-          <Tabs
-            defaultActiveKey="active"
-            items={[
-              {
-                key: 'active',
-                label: (
-                  <span>
-                    <EyeOutlined />
-                    Active Staff
-                  </span>
-                ),
-                children: <ActiveStaffTable />
-              },
-              {
-                key: 'history',
-                label: (
-                  <span>
-                    <HistoryOutlined />
-                    Shift History
-                  </span>
-                ),
-                children: <ShiftHistoryTable />
-              },
-              {
-                key: 'locations',
-                label: (
-                  <span>
-                    <EnvironmentOutlined />
-                    Location Management
-                  </span>
-                ),
-                children: <LocationManagement />
-              }
-            ]}
-          />
-        </Col>
-
-        {/* Right Column - Analytics & Settings */}
-        <Col xs={24} lg={10}>
-          <Card title={<><BarChartOutlined /> Analytics Dashboard</>} style={{ marginBottom: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <BarChartOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-              <Title level={4} type="secondary">Analytics Coming Soon</Title>
-              <Paragraph type="secondary">
-                Staff performance metrics, average hours, and weekly summaries will be available here.
-              </Paragraph>
-              <Button type="dashed" disabled>
-                View Reports
-              </Button>
-            </div>
-          </Card>
-
-          <Card title={<><EnvironmentOutlined /> Geofencing Status</>}>
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '16px' }}>
-                <Text strong>✅ Location-Based Security Active</Text>
-              </div>
-              <Paragraph type="secondary" style={{ fontSize: '14px', marginBottom: '12px' }}>
-                All clock-in attempts are now validated against location geofences. Care workers must be within the specified radius to clock in.
-              </Paragraph>
-              <div style={{ marginBottom: '8px' }}>
-                <Tag color="green">Geofencing Enabled</Tag>
-              </div>
-              <div style={{ marginBottom: '8px' }}>
-                <Tag color="blue">GPS Validation</Tag>
-              </div>
-              <div style={{ marginBottom: '16px' }}>
-                <Tag color="orange">Manager Controls</Tag>
-              </div>
-              <Text type="secondary" style={{ fontSize: '12px' }}>
-                Use the "Location Management" tab to adjust geofence radii for each workplace.
-              </Text>
-            </div>
-          </Card>
-        </Col>
-      </Row>
+      <div>
+        {/* Staff Management Tabs */}
+        <Tabs
+          defaultActiveKey="active"
+          items={[
+            {
+              key: 'active',
+              label: (
+                <span>
+                  <EyeOutlined />
+                  Active Staff
+                </span>
+              ),
+              children: (
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} lg={14}>
+                    <ActiveStaffTable />
+                  </Col>
+                  <Col xs={24} lg={10}>
+                    <Card title={<><EnvironmentOutlined /> Geofencing Status</>}>
+                      <div style={{ padding: '20px' }}>
+                        <div style={{ marginBottom: '16px' }}>
+                          <Text strong>✅ Location-Based Security Active</Text>
+                        </div>
+                        <Paragraph type="secondary" style={{ fontSize: '14px', marginBottom: '12px' }}>
+                          All clock-in attempts are now validated against location geofences. Care workers must be within the specified radius to clock in.
+                        </Paragraph>
+                        <div style={{ marginBottom: '8px' }}>
+                          <Tag color="green">Geofencing Enabled</Tag>
+                        </div>
+                        <div style={{ marginBottom: '8px' }}>
+                          <Tag color="blue">GPS Validation</Tag>
+                        </div>
+                        <div style={{ marginBottom: '16px' }}>
+                          <Tag color="orange">Manager Controls</Tag>
+                        </div>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>
+                          Use the "Location Management" tab to adjust geofence radii for each workplace.
+                        </Text>
+                      </div>
+                    </Card>
+                  </Col>
+                </Row>
+              )
+            },
+            {
+              key: 'history',
+              label: (
+                <span>
+                  <HistoryOutlined />
+                  Shift History
+                </span>
+              ),
+              children: <ShiftHistoryTable />
+            },
+            {
+              key: 'locations',
+              label: (
+                <span>
+                  <EnvironmentOutlined />
+                  Location Management
+                </span>
+              ),
+              children: <LocationManagement />
+            },
+            {
+              key: 'analytics',
+              label: (
+                <span>
+                  <BarChartOutlined />
+                  Analytics
+                </span>
+              ),
+              children: <AnalyticsDashboard />
+            }
+          ]}
+        />
+      </div>
 
       {/* Access Control Info */}
       <Divider />

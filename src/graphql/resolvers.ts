@@ -159,6 +159,132 @@ export const resolvers = {
         orderBy: { name: 'asc' }
       });
     },
+
+    // Analytics query for daily statistics
+    dailyStats: async (_parent: unknown, args: { date: string }, context: GraphQLContext) => {
+      // Check if user is authenticated and is a manager
+      if (!context.session || !context.user) {
+        throw new Error('You must be authenticated to access this resource');
+      }
+
+      if (context.user.role !== 'MANAGER') {
+        throw new Error('You must be a manager to access analytics data');
+      }
+
+      // Parse the date and create date range for the day
+      const targetDate = new Date(args.date);
+      const startOfDay = new Date(targetDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(targetDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      console.log(`📊 Manager ${context.user.email} requesting daily stats for ${args.date}`);
+
+      // Get all shifts that were clocked in on the target date
+      const dayShifts = await prisma.shift.findMany({
+        where: {
+          clockInTime: {
+            gte: startOfDay,
+            lte: endOfDay
+          }
+        },
+        include: {
+          user: true
+        }
+      });
+
+      // Calculate statistics
+      const totalClockIns = dayShifts.length;
+      const uniqueStaff = new Set(dayShifts.map(shift => shift.userId));
+      const totalStaffActive = uniqueStaff.size;
+      
+      // Calculate average hours (only for completed shifts)
+      const completedShifts = dayShifts.filter(shift => shift.totalHours !== null);
+      const totalHours = completedShifts.reduce((sum, shift) => sum + (shift.totalHours || 0), 0);
+      const avgHours = completedShifts.length > 0 ? totalHours / completedShifts.length : 0;
+
+      console.log(`📈 Daily stats: ${totalClockIns} clock-ins, ${totalStaffActive} staff, ${avgHours.toFixed(1)}h avg`);
+
+      return {
+        date: args.date,
+        avgHours: Math.round(avgHours * 100) / 100, // Round to 2 decimal places
+        totalClockIns,
+        totalStaffActive
+      };
+    },
+
+    // Analytics query for weekly hours per staff member
+    weeklyHoursPerStaff: async (_parent: unknown, _args: unknown, context: GraphQLContext) => {
+      // Check if user is authenticated and is a manager
+      if (!context.session || !context.user) {
+        throw new Error('You must be authenticated to access this resource');
+      }
+
+      if (context.user.role !== 'MANAGER') {
+        throw new Error('You must be a manager to access analytics data');
+      }
+
+      // Calculate date range for last 7 days
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+
+      console.log(`📊 Manager ${context.user.email} requesting weekly hours per staff`);
+
+      // Get all shifts from the last 7 days with completed hours
+      const weeklyShifts = await prisma.shift.findMany({
+        where: {
+          clockInTime: {
+            gte: startDate,
+            lte: endDate
+          },
+          totalHours: {
+            not: null
+          }
+        },
+        include: {
+          user: true
+        },
+        orderBy: {
+          clockInTime: 'desc'
+        }
+      });
+
+      // Group by staff and calculate totals
+      const staffHoursMap = new Map();
+      
+      weeklyShifts.forEach(shift => {
+        const staffId = shift.user.id;
+        
+        if (!staffHoursMap.has(staffId)) {
+          staffHoursMap.set(staffId, {
+            staffId: staffId,
+            staffName: shift.user.name || shift.user.email.split('@')[0],
+            staffEmail: shift.user.email,
+            totalHours: 0,
+            shiftsCount: 0
+          });
+        }
+        
+        const staffData = staffHoursMap.get(staffId);
+        staffData.totalHours += shift.totalHours || 0;
+        staffData.shiftsCount += 1;
+      });
+
+      // Convert map to array and sort by total hours (descending)
+      const staffWeeklyHours = Array.from(staffHoursMap.values())
+        .map(staff => ({
+          ...staff,
+          totalHours: Math.round(staff.totalHours * 100) / 100 // Round to 2 decimal places
+        }))
+        .sort((a, b) => b.totalHours - a.totalHours);
+
+      console.log(`📈 Weekly stats: ${staffWeeklyHours.length} staff members with hours`);
+
+      return staffWeeklyHours;
+    },
   },
 
   Mutation: {
