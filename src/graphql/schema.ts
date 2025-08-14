@@ -65,5 +65,10 @@ export const typeDefs = gql`
         myActiveShift: Shift
         activeShifts: [Shift!]!
         allShifts(skip: Int, take: Int): ShiftConnection!
+        allLocations: [Location!]!
+    }
+
+    type Mutation {
+        updateLocation(locationId: ID!, radius: Int!): Location!
     }
     `;
