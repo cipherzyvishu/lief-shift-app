@@ -1,16 +1,19 @@
 'use client';
 
 import React from 'react';
-import { Card, Typography, Space, Button, Tag, Divider, Row, Col } from 'antd';
+import { Card, Typography, Space, Button, Tag, Divider, Row, Col, Tabs } from 'antd';
 import { 
   UserOutlined, 
   ClockCircleOutlined, 
   SettingOutlined,
   TeamOutlined,
   BarChartOutlined,
-  EnvironmentOutlined
+  EnvironmentOutlined,
+  EyeOutlined,
+  HistoryOutlined
 } from '@ant-design/icons';
 import ActiveStaffTable from './dashboard/ActiveStaffTable';
+import ShiftHistoryTable from './dashboard/ShiftHistoryTable';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -99,23 +102,32 @@ export default function ManagerDashboard({ user }: ManagerDashboardProps) {
       <Row gutter={[16, 16]}>
         {/* Left Column - Staff Management */}
         <Col xs={24} lg={14}>
-          {/* Active Staff Table - Real Implementation */}
-          <div style={{ marginBottom: '16px' }}>
-            <ActiveStaffTable />
-          </div>
-
-          <Card title={<><ClockCircleOutlined /> Recent Shift Activity</>}>
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <ClockCircleOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-              <Title level={4} type="secondary">Shift History Coming Soon</Title>
-              <Paragraph type="secondary">
-                Detailed clock-in/out history with timestamps and locations will be displayed here.
-              </Paragraph>
-              <Button type="dashed" disabled>
-                View Shift History
-              </Button>
-            </div>
-          </Card>
+          {/* Staff Management Tabs */}
+          <Tabs
+            defaultActiveKey="active"
+            items={[
+              {
+                key: 'active',
+                label: (
+                  <span>
+                    <EyeOutlined />
+                    Active Staff
+                  </span>
+                ),
+                children: <ActiveStaffTable />
+              },
+              {
+                key: 'history',
+                label: (
+                  <span>
+                    <HistoryOutlined />
+                    Shift History
+                  </span>
+                ),
+                children: <ShiftHistoryTable />
+              }
+            ]}
+          />
         </Col>
 
         {/* Right Column - Analytics & Settings */}

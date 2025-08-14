@@ -12,6 +12,7 @@ export interface GraphQLContext {
     email: string;
     role: string;
   };
+  prisma: import('@prisma/client').PrismaClient; // Add prisma instance to the context for resolvers
 }
 
 export interface GraphQLResolverArgs {
